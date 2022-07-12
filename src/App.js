@@ -1,67 +1,72 @@
-import React from 'react'
-import Items from './Items'
+import React from "react"
 
 function App() {
-	const [numberOfItems,setNumberOfItems] = React.useState(Items.items.length)
-	const [list,setList] = React.useState()
 
-	const input = document.querySelector('input')
+	const [lists,setLists] = React.useState(()=>{
+		const savedTodos = localStorage.getItem("list");
+		if (savedTodos) {
+		  return JSON.parse(savedTodos);
+		} else {
+		  return [];
+		}
+	})
+	const [input,setInput] = React.useState('')
+
+	console.log()
+	
     function handleAdd(){
-		input.focus()
-		if(input.value !== ''){
-			Items.items.push({id: Items.items.length, text : input.value})
-			setNumberOfItems(oldNumberOfItems => oldNumberOfItems + 1)
-			input.value = ''
-			console.log(Items.items)
-		}else{
-			return false
+		
+		if (input.trim() !== "") {
+			setLists([
+				...lists,
+				{
+					id: lists.length + 1,
+					text: input.trim()
+				}
+			]);
+			console.log(lists)
+			setInput('')
 		}
     }
-
-
+	
+	
 	window.addEventListener('keypress',e=>{
 		if(e.key === 'Enter'){
-			if(input.value !== ''){
-				handleAdd()
-			}else{
-				return false
-			}
+			handleAdd()
+		}else{
+			return
 		}
 	})
 	
-	function handleDelete(e){
-		Items.items.splice(e.target.dataset.value,1)
-		setNumberOfItems(oldNumberOfItems => oldNumberOfItems - 1)
-		if(numberOfItems ===  0){
-			Items.items.splice(0, Items.items.length)
-		}
-		console.log(Items.items)
+	function handleDelete(id){
+		const removeItem = lists.filter((item)=>{
+			return item.id !== id
+		})
+		setLists(removeItem)
 	}
-
+	
 	function handleReset(){
-		Items.items.splice(0, Items.items.length)
-		setNumberOfItems(oldNumberOfItems => oldNumberOfItems = 0)
+		setLists(lists.splice( 0 , lists.length ))
 	}
+	
 	React.useEffect(() => {
-		setList(oldList => oldList = Items.items.map(item=>{
-			return(
-				<div className='item' key={item.id}>
-					<span>{item.text}</span>
-					<button onClick={handleDelete} data-value={item.id} className='delete-btn'>Delete</button>
-				</div>
-			)
-		}))
-	},[numberOfItems])
+		localStorage.setItem('list',JSON.stringify(lists))
+	},[lists])
 	
   	return (
     	<>
 			<div className='some-sing'>
 				<button onClick={handleReset} className='btn'>Reset</button>
-				<input autoFocus className='input' type='text'/>
+				<input autoFocus className='input' value={input} onChange={e=>setInput(e.target.value)} type='text'/>
 				<button onClick={handleAdd} className='btn'>Add</button>
 			</div>
 			<div className='list'>
-				{ list }
+				{ lists !== null && lists.map(item=>(
+					<div className='item' key={item.id}>
+						<span>{item.text}</span>
+						<button onClick={()=> handleDelete(item.id)} className='delete-btn'>Delete</button>
+					</div>
+				)) }
 			</div>
 		</>
 	)
