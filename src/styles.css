@@ -33,6 +33,7 @@ body {
   border-radius: 20px;
   border: 2px solid black;
   color: black;
+  
   background-color: white;
   outline: none;
   -webkit-transition: all 0.3s ease-in-out;
@@ -97,5 +98,6 @@ body {
   color: white;
   padding: 7px 14px;
   border-radius: 5px;
+  cursor: pointer;
 }
 /*# sourceMappingURL=styles.css.map */
